@@ -4,15 +4,10 @@ import { AppModule } from './app.module.js';
 import cookieSession from 'cookie-session';
 
 async function bootstrap() {
-  const cookieKey = process.env.COOKIE_KEY;
-  if (!cookieKey) {
-    throw new Error('COOKIE_KEY environment variable is required');
-  }
-
   const app = await NestFactory.create(AppModule);
   app.use(
     cookieSession({
-      keys: [cookieKey],
+      keys: [process.env.COOKIE_KEY ?? 'development-only-key'],
     }),
   );
   app.useGlobalPipes(
