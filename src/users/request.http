@@ -1,0 +1,40 @@
+### Create A new user
+POST  http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+    "email":"tom@outlook.com",
+    "password":"tom"
+}
+
+### signin A new user
+POST  http://localhost:3000/auth/signin
+Content-Type: application/json
+
+{
+    "email":"tom@outlook.com",
+    "password":"tom"
+}
+
+### current signin user
+GET  http://localhost:3000/auth/whoAmI
+
+### signout current signin user
+POST  http://localhost:3000/auth/signout
+
+### Find A user with given ID
+GET http://localhost:3000/auth/1
+
+### Find All users with given Email
+GET http://localhost:3000/auth?email=serenae@outlook.com
+
+### Remove A user with given ID
+DELETE  http://localhost:3000/auth/2
+
+### Update A user with given ID and/or email,password
+PATCH  http://localhost:3000/auth/2
+Content-Type: application/json
+
+{
+    "email": "test@gmail.com"
+}
