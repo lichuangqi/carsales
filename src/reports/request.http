@@ -1,0 +1,20 @@
+POST  http://localhost:3000/reports
+Content-Type: application/json
+
+{
+    "make":"Mercedz",
+    "model":"AMG A45",
+    "year":2026,
+    "mileage":100,
+    "lat":0,
+    "lng":0,
+    "price": 120000
+}
+
+### Approve an existing report
+PATCH http://localhost:3000/reports/4
+Content-Type: application/json
+
+{
+    "approved": true
+}

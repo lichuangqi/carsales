@@ -5,7 +5,10 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
+import type { Relation } from 'typeorm';
+import { Report } from '../reports/report.entity.js';
 
 @Entity()
 export class User {
@@ -15,6 +18,8 @@ export class User {
   email: string;
   @Column()
   password: string;
+  @OneToMany(() => Report, (report) => report.user)
+  reports: Relation<Report[]>;
   @AfterInsert()
   logInsert() {
     console.log('Insert User with id', this.id);
