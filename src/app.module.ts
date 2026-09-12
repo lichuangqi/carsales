@@ -7,8 +7,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { UsersModule } from './users/users.module.js';
 import { ReportsModule } from './reports/reports.module.js';
-import { User } from './users/user.entity.js';
-import { Report } from './reports/report.entity.js';
+import { databaseOptions } from './database.config.js';
 
 @Module({
   imports: [
@@ -16,23 +15,7 @@ import { Report } from './reports/report.entity.js';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        return {
-          type: 'better-sqlite3',
-          database: config.get<string>('DB_NAME'),
-          entities: [User, Report],
-          synchronize: true,
-        };
-      },
-    }),
-    // TypeOrmModule.forRoot({
-    //   type: 'better-sqlite3',
-    //   database: 'db.sqlite',
-    //   entities: [User, Report],
-    //   synchronize: true,
-    // }),
+    TypeOrmModule.forRoot(databaseOptions),
     UsersModule,
     ReportsModule,
   ],
