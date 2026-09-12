@@ -2,19 +2,22 @@ POST  http://localhost:3000/reports
 Content-Type: application/json
 
 {
-    "make":"Mercedz",
-    "model":"AMG A45",
-    "year":2026,
-    "mileage":100,
+    "make":"GWM",
+    "model":"TANK300",
+    "year":2024,
+    "mileage":10000,
     "lat":0,
     "lng":0,
-    "price": 120000
+    "price": 22222
 }
 
 ### Approve an existing report
-PATCH http://localhost:3000/reports/4
+PATCH http://localhost:3000/reports/5
 Content-Type: application/json
 
 {
     "approved": true
 }
+
+### get Estimate for existing vehicle
+ GET  http://localhost:3000/reports?make=GWM&model=TANK300&lng=0&lat=0&mileage=10000&year=2024
