@@ -1,123 +1,132 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Carsales API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Carsales API is a NestJS backend for user authentication, vehicle sales reports, report approval, and market-price estimation. It exposes a validated REST API backed by TypeORM, using SQLite for local development and PostgreSQL in production.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- Email and password signup/signin with salted password hashing
+- Cookie-based sessions and authenticated user resolution
+- Authentication and administrator authorization guards
+- User CRUD operations with serialized responses
+- Vehicle sales report creation and administrator approval
+- Price estimates calculated from approved reports with vehicle and location filters
+- DTO validation, response serialization, middleware, interceptors, and dependency injection
+- TypeORM migrations shared across SQLite and PostgreSQL
+- Unit and end-to-end tests with Vitest and Supertest
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Architecture
 
-## Project setup
+The application is organized into NestJS feature modules:
+
+- `UsersModule` manages users, authentication, sessions, and user persistence.
+- `ReportsModule` manages vehicle reports, approval, and price-estimate queries.
+- Controllers define the HTTP boundary and validation contracts.
+- Services contain application and domain logic.
+- TypeORM repositories and entities provide database persistence.
+- Guards and middleware enforce authentication and permissions.
+- Interceptors and DTOs control the shape of API responses.
+
+## Technology
+
+- Node.js 24
+- TypeScript and NestJS
+- TypeORM
+- SQLite for local development and isolated tests
+- PostgreSQL on Neon for production
+- Vitest and Supertest
+- Render Blueprint deployment
+
+## Local setup
+
+Install dependencies:
 
 ```bash
-$ npm install
+npm install
 ```
 
-Set the cookie signing key before starting the application:
+Create `.env.development`:
 
-```bash
-$ export COOKIE_KEY="replace-with-a-long-random-value"
+```dotenv
+DB_NAME=db.sqlite
+COOKIE_KEY=replace-with-a-long-random-value
 ```
 
-See `.env.example` for the required environment variables. Never commit real
-secret values.
-
-## Compile and run the project
+Apply database migrations and start the development server:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run migration:run
+npm run start:dev
 ```
 
-## Run tests
+The API listens on `http://localhost:3000` by default.
+
+## API overview
+
+### Authentication and users
+
+| Method | Route | Description |
+| --- | --- | --- |
+| `POST` | `/auth/signup` | Create an account and start a session |
+| `POST` | `/auth/signin` | Authenticate and start a session |
+| `POST` | `/auth/signout` | Clear the current session |
+| `GET` | `/auth/whoami` | Return the authenticated user |
+| `GET` | `/auth?email=...` | Find users by email |
+| `GET` | `/auth/:id` | Find a user by ID |
+| `PATCH` | `/auth/:id` | Update a user |
+| `DELETE` | `/auth/:id` | Delete a user |
+
+### Reports
+
+| Method | Route | Description |
+| --- | --- | --- |
+| `POST` | `/reports` | Create a vehicle sales report |
+| `PATCH` | `/reports/:id` | Approve or reject a report as an administrator |
+| `GET` | `/reports` | Estimate a vehicle price from approved reports |
+
+The estimate endpoint accepts `make`, `model`, `year`, `mileage`, `lng`, and `lat` query parameters.
+
+## Database migrations
 
 ```bash
-# unit tests
-$ npm run test
+# Generate a migration after changing an entity
+npm run migration:generate -- src/migrations/MigrationName
 
-# e2e tests
-$ npm run test:e2e
+# Show migration status
+npm run migration:show
 
-# test coverage
-$ npm run test:cov
+# Apply pending migrations
+npm run migration:run
+
+# Revert the latest migration
+npm run migration:revert
+```
+
+Automatic schema synchronization is disabled outside the disposable test environment. Database changes are applied through versioned migrations.
+
+## Testing and quality checks
+
+```bash
+npm test
+npm run test:e2e
+npm run test:cov
+npm run lint
+npm run build
 ```
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+The repository includes a `render.yaml` Blueprint for deploying the API as a Render Web Service in Singapore. Production uses a Neon PostgreSQL connection supplied through `DATABASE_URL`; Render generates the cookie-signing key automatically.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+The deployment startup command applies pending TypeORM migrations before starting the NestJS server:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:render
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Required production environment variables:
 
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Neon PostgreSQL connection string |
+| `COOKIE_KEY` | Cookie-session signing secret |
+| `PORT` | HTTP port supplied automatically by Render |
