@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: carsales-api
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start:render
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: COOKIE_KEY
+        generateValue: true
