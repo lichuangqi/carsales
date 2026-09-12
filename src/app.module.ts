@@ -48,11 +48,13 @@ import { Report } from './reports/report.entity.js';
   ],
 })
 export class AppModule {
+  constructor(private configService: ConfigService) {}
   configure(consumer: MiddlewareConsumer) {
+    const cookieKey = this.configService.getOrThrow<string>('COOKIE_KEY');
     consumer
       .apply(
         cookieSession({
-          keys: [process.env.COOKIE_KEY ?? 'development-only-key'],
+          keys: [cookieKey],
         }),
       )
       .forRoutes('*');
